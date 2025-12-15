@@ -228,14 +228,17 @@ export function TaskFormDialog({ open, onOpenChange, task }: TaskFormDialogProps
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Assign To</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ''}>
+                  <Select 
+                    onValueChange={(val) => field.onChange(val === 'unassigned' ? null : val)} 
+                    value={field.value || 'unassigned'}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select team member" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
                       {profiles.map(profile => (
                         <SelectItem key={profile.user_id} value={profile.user_id}>
                           {profile.full_name || 'Unknown'}
