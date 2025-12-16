@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, CheckSquare, Mail, Lock, User } from 'lucide-react';
+import { Loader2, CheckSquare, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,8 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
 
   const signInForm = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
@@ -123,7 +125,14 @@ export default function AuthPage() {
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input {...field} type="password" placeholder="••••••••" className="pl-10" />
+                            <Input {...field} type={showSignInPassword ? 'text' : 'password'} placeholder="••••••••" className="pl-10 pr-10" />
+                            <button
+                              type="button"
+                              onClick={() => setShowSignInPassword(!showSignInPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -182,7 +191,14 @@ export default function AuthPage() {
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input {...field} type="password" placeholder="••••••••" className="pl-10" />
+                            <Input {...field} type={showSignUpPassword ? 'text' : 'password'} placeholder="••••••••" className="pl-10 pr-10" />
+                            <button
+                              type="button"
+                              onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                           </div>
                         </FormControl>
                         <FormMessage />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, LayoutDashboard, ListTodo, Clock, User, Bell, LogOut, CheckSquare } from 'lucide-react';
+import { Plus, LayoutDashboard, ListTodo, Clock, User, Bell, LogOut, CheckSquare, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,14 +14,20 @@ import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { ProfileImageUpload } from '@/components/ProfileImageUpload';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export default function Dashboard() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, updateProfile } = useAuth();
   const [filters, setFilters] = useState<TaskFilters>({});
   const [sort, setSort] = useState<TaskSort>({ field: 'created_at', direction: 'desc' });
   const [activeTab, setActiveTab] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   const { data: allTasks = [], isLoading } = useTasks(filters, sort);
   const { data: notifications = [] } = useNotifications();
@@ -52,6 +58,9 @@ export default function Dashboard() {
   const handleEdit = (task: Task) => { setEditingTask(task); setDialogOpen(true); };
   const handleDelete = (id: string) => deleteTask.mutate(id);
   const handleCreate = () => { setEditingTask(null); setDialogOpen(true); };
+  const handleAvatarUpload = async (url: string) => {
+    await updateProfile({ avatar_url: url });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,6 +102,37 @@ export default function Dashboard() {
                 </ScrollArea>
               </PopoverContent>
             </Popover>
+            <ThemeToggle />
+            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Profile Settings</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="flex flex-col items-center gap-4">
+                    <ProfileImageUpload
+                      avatarUrl={profile?.avatar_url || null}
+                      fullName={profile?.full_name || null}
+                      onUploadComplete={handleAvatarUpload}
+                    />
+                    <p className="text-sm text-muted-foreground">Click the camera to upload a new photo</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Full Name</Label>
+                    <Input value={profile?.full_name || ''} disabled className="bg-muted" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input value={user?.email || ''} disabled className="bg-muted" />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             <span className="text-sm text-muted-foreground hidden sm:block">{profile?.full_name || user?.email}</span>
             <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
           </div>
