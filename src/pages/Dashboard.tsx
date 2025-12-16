@@ -11,6 +11,7 @@ import { TaskFiltersBar } from '@/components/tasks/TaskFiltersBar';
 import { StatsSkeleton } from '@/components/tasks/TaskSkeleton';
 import { Task, TaskFilters, TaskSort } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
@@ -133,7 +134,15 @@ export default function Dashboard() {
                 </div>
               </DialogContent>
             </Dialog>
-            <span className="text-sm text-muted-foreground hidden sm:block">{profile?.full_name || user?.email}</span>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8 border border-border">
+                <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'Profile'} />
+                <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                  {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm text-muted-foreground hidden sm:block">{profile?.full_name || user?.email}</span>
+            </div>
             <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
           </div>
         </div>
