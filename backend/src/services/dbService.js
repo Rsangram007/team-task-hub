@@ -156,11 +156,11 @@ const createTask = async (taskData) => {
   const {
     title,
     description,
-    dueDate,
+    due_date,
     priority,
     status,
-    creatorId,
-    assignedToId,
+    creator_id,
+    assigned_to_id,
   } = taskData;
 
   const query = `
@@ -172,18 +172,18 @@ const createTask = async (taskData) => {
   const result = await db.query(query, [
     title,
     description || null,
-    dueDate || null,
+    due_date || null,
     priority,
     status,
-    creatorId,
-    assignedToId || null,
+    creator_id,
+    assigned_to_id || null,
   ]);
 
   return result.rows[0];
 };
 
 const updateTask = async (taskId, taskData) => {
-  const { title, description, dueDate, priority, status, assignedToId } =
+  const { title, description, due_date, priority, status, assigned_to_id } =
     taskData;
 
   const query = `
@@ -197,10 +197,10 @@ const updateTask = async (taskId, taskData) => {
   const result = await db.query(query, [
     title,
     description || null,
-    dueDate || null,
+    due_date || null,
     priority,
     status,
-    assignedToId || null,
+    assigned_to_id || null,
     taskId,
   ]);
 

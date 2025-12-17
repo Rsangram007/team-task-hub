@@ -41,18 +41,29 @@ const getTaskById = async (req, res) => {
 // Create a new task
 const createTask = async (req, res) => {
   try {
+    console.log("Received task data:", req.body);
     const userId = req.user.userId; // Use userId from the decoded token
     const taskData = {
       ...req.body,
-      creatorId: userId, // Set creator to current user
+      creator_id: userId, // Set creator to current user
     };
 
-    // Validate required fields
-    if (!taskData.title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
-
     const task = await dbService.createTask(taskData);
+
+    // Create notification if task is assigned to someone
+    if (task.assigned_to_id && task.assigned_to_id !== userId) {
+      const creatorProfile = await dbService.getUserProfile(userId);
+      const creatorName = creatorProfile
+        ? creatorProfile.full_name || "Someone"
+        : "Someone";
+
+      await dbService.createNotification({
+        userId: task.assigned_to_id,
+        title: "New task assigned",
+        message: `${creatorName} assigned you to: ${task.title}`,
+        taskId: task.id,
+      });
+    }
 
     // Create audit log
     await dbService.createAuditLog({
@@ -85,6 +96,25 @@ const updateTask = async (req, res) => {
     // Update the task
     const task = await dbService.updateTask(id, taskData);
 
+    // Create notification if task is newly assigned or reassigned
+    if (
+      task.assigned_to_id &&
+      task.assigned_to_id !== existingTask.assigned_to_id &&
+      task.assigned_to_id !== userId
+    ) {
+      const updaterProfile = await dbService.getUserProfile(userId);
+      const updaterName = updaterProfile
+        ? updaterProfile.full_name || "Someone"
+        : "Someone";
+
+      await dbService.createNotification({
+        userId: task.assigned_to_id,
+        title: "Task assigned",
+        message: `${updaterName} assigned you to: ${task.title}`,
+        taskId: task.id,
+      });
+    }
+
     // Create audit log
     await dbService.createAuditLog({
       taskId: id,
@@ -115,6 +145,14 @@ const deleteTask = async (req, res) => {
 
     // Delete the task
     const task = await dbService.deleteTask(id);
+
+    // Emit task deleted event via WebSocket
+    const { app } = require("../server");
+    const io = app.get("io");
+    if (io) {
+      const { emitTaskDeleted } = require("../utils/websocket");
+      emitTaskDeleted(io, id);
+    }
 
     // Create audit log
     await dbService.createAuditLog({

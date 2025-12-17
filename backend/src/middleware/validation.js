@@ -25,7 +25,7 @@ const schemas = {
       .valid("todo", "in_progress", "review", "completed")
       .required(),
     assigned_to_id: Joi.string().uuid().optional().allow(null),
-    creator_id: Joi.string().uuid().required(),
+    creator_id: Joi.string().uuid().optional().allow(null), // Allow creator_id but don't require it since it's set by the backend
   }),
 
   // Task update schema
@@ -51,8 +51,14 @@ const schemas = {
 // Validation middleware function
 const validate = (schema) => {
   return (req, res, next) => {
-    const { error } = schema.validate(req.body);
+    console.log("Validating request body:", req.body);
+    const { error } = schema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: false, // Don't strip unknown fields, let the controller handle them
+      allowUnknown: true,
+    });
     if (error) {
+      console.error("Validation error details:", error.details);
       return res.status(400).json({
         message: "Validation error",
         details: error.details.map((detail) => detail.message),
