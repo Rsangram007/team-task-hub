@@ -69,16 +69,25 @@ npm install
 
 #### Frontend
 
-Create a `.env` file in the `frontend` directory with:
+For local development, create a `.env` file in the `frontend` directory with:
 
 ```env
+# API Configuration
 VITE_API_URL=http://localhost:3000/api
 VITE_WEBSOCKET_URL=http://localhost:3000
 ```
 
+For production deployments, create a `.env.production` file with:
+
+```env
+# API Configuration for Render
+VITE_API_URL=https://your-app-name.onrender.com/api
+VITE_WEBSOCKET_URL=https://your-app-name.onrender.com
+```
+
 #### Backend
 
-Create a `.env` file in the `backend` directory with:
+For local development, create a `.env` file in the `backend` directory with:
 
 ```env
 # Server Configuration
@@ -86,15 +95,15 @@ PORT=3000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 
-# Database Configuration
+# Database Configuration for Development
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=team_task_hub
-DB_USER=your_db_username
-DB_PASSWORD=your_db_password
+DB_USER=postgres
+DB_PASSWORD=your_local_db_password
 
 # JWT Configuration
-JWT_SECRET=your_jwt_secret_key
+JWT_SECRET=your_secure_jwt_secret_key_change_this
 JWT_EXPIRES_IN=24h
 
 # Cloudinary Configuration
@@ -102,6 +111,8 @@ CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
+
+For production deployment (Render, Heroku, etc.), the application will automatically use the `DATABASE_URL` environment variable provided by the platform.
 
 ### Database Setup
 
