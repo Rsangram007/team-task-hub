@@ -8,7 +8,7 @@ const { Server } = require("socket.io");
 
 // Load environment variables
 dotenv.config();
- 
+
 // Create Express app
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +19,7 @@ const io = new Server(server, {
     origin: process.env.FRONTEND_URL || [
       "http://localhost:5173",
       "https://team-task-hub.onrender.com",
+      "https://team-task-hub-eight.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -32,6 +33,7 @@ app.use(
     origin: process.env.FRONTEND_URL || [
       "http://localhost:5173",
       "https://team-task-hub.onrender.com",
+      "https://team-task-hub-eight.vercel.app",
     ],
     credentials: true,
   })
