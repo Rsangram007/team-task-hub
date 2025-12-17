@@ -17,7 +17,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || [
-      "http://localhost:5173",
+      "http://localhost:8080",
       "https://team-task-hub.onrender.com",
       "https://team-task-hub-eight.vercel.app",
     ],
@@ -31,7 +31,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || [
-      "http://localhost:5173",
+      "http://localhost:8080",
       "https://team-task-hub.onrender.com",
       "https://team-task-hub-eight.vercel.app",
     ],
