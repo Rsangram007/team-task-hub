@@ -21,6 +21,8 @@ const uploadImage = async (req, res) => {
 
     const result = await cloudinaryService.uploadImage(image, folder);
 
+    let updatedProfile = null;
+
     // Update user profile with the new avatar URL
     const userId = req.user.userId; // Use userId from the decoded token
     if (userId) {
@@ -29,14 +31,16 @@ const uploadImage = async (req, res) => {
       console.log("Current profile:", currentProfile);
 
       // Update only the avatar URL while preserving the full name
-      const updatedProfile = await dbService.updateProfile(userId, {
+      updatedProfile = await dbService.updateProfile(userId, {
         fullName: currentProfile.full_name,
         avatarUrl: result.url,
       });
       console.log("Updated profile:", updatedProfile);
     }
 
+    // Return the updated profile in the same format as the profile update endpoint
     res.json({
+      profile: updatedProfile,
       url: result.url,
       public_id: result.public_id,
     });

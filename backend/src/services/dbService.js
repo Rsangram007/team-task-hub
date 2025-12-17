@@ -68,13 +68,41 @@ const getAllProfiles = async () => {
 };
 
 const updateProfile = async (userId, { fullName, avatarUrl }) => {
+  // Build dynamic query based on provided fields
+  const fields = [];
+  const values = [];
+  let paramCount = 1;
+
+  if (fullName !== undefined) {
+    fields.push(`full_name = $${paramCount}`);
+    values.push(fullName);
+    paramCount++;
+  }
+
+  if (avatarUrl !== undefined) {
+    fields.push(`avatar_url = $${paramCount}`);
+    values.push(avatarUrl);
+    paramCount++;
+  }
+
+  // Always update the timestamp
+  fields.push("updated_at = NOW()");
+
+  if (fields.length === 1) {
+    // Only timestamp would be updated, skip the update
+    return await getUserProfile(userId);
+  }
+
   const query = `
     UPDATE profiles
-    SET full_name = $1, avatar_url = $2, updated_at = NOW()
-    WHERE user_id = $3
+    SET ${fields.join(", ")}
+    WHERE user_id = $${paramCount}
     RETURNING id, user_id, full_name, avatar_url, created_at, updated_at
   `;
-  const result = await db.query(query, [fullName, avatarUrl, userId]);
+
+  values.push(userId);
+
+  const result = await db.query(query, values);
   return result.rows[0];
 };
 

@@ -43,14 +43,22 @@ const updateCurrentUserProfile = async (req, res) => {
       await dbService.updateUserEmail(userId, email);
     }
 
-    // Update profile information
-    const profile = await dbService.updateProfile(userId, {
-      fullName,
-      avatarUrl,
-    });
+    // Build update object with only provided fields
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
 
-    if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
+    // Only update profile if there are fields to update
+    let profile = null;
+    if (Object.keys(updateData).length > 0) {
+      profile = await dbService.updateProfile(userId, updateData);
+
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+    } else {
+      // If no profile fields to update, just get the current profile
+      profile = await dbService.getUserProfile(userId);
     }
 
     res.json({ profile });
