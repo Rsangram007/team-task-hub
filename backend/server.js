@@ -8,7 +8,7 @@ const { Server } = require("socket.io");
 
 // Load environment variables
 dotenv.config();
-
+ 
 // Create Express app
 const app = express();
 const server = http.createServer(app);
@@ -16,14 +16,26 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || [
+      "http://localhost:5173",
+      "https://team-task-hub.onrender.com",
+    ],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || [
+      "http://localhost:5173",
+      "https://team-task-hub.onrender.com",
+    ],
+    credentials: true,
+  })
+);
 app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));

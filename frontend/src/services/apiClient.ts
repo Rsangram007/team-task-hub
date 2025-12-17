@@ -1,6 +1,6 @@
 // apiClient.ts
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || "https://team-task-hub.onrender.com/api";
 
 interface ApiError extends Error {
   status?: number;
