@@ -13,14 +13,26 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+// Define allowed origins
+const allowedOrigins = [
+  "http://localhost:8080",
+  "https://team-task-hub.onrender.com",
+  "https://team-task-hub-eight.vercel.app",
+  // Add the FRONTEND_URL from environment if it exists and is not already in the list
+  ...(process.env.FRONTEND_URL &&
+  ![
+    "http://localhost:8080",
+    "https://team-task-hub.onrender.com",
+    "https://team-task-hub-eight.vercel.app",
+  ].includes(process.env.FRONTEND_URL)
+    ? [process.env.FRONTEND_URL]
+    : []),
+];
+
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || [
-      "http://localhost:8080",
-      "https://team-task-hub.onrender.com",
-      "https://team-task-hub-eight.vercel.app",
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -30,11 +42,7 @@ const io = new Server(server, {
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || [
-      "http://localhost:8080",
-      "https://team-task-hub.onrender.com",
-      "https://team-task-hub-eight.vercel.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
